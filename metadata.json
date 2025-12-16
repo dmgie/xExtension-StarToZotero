@@ -1,0 +1,8 @@
+{
+  "name": "StarToZotero",
+  "author": "You",
+  "description": "Send an entry to Zotero when you Star (Favorite) it.",
+  "version": 1.0,
+  "entrypoint": "StarToZotero",
+  "type": "user"
+}

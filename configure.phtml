@@ -1,0 +1,74 @@
+<?php
+    $api_key = FreshRSS_Context::$user_conf->zotero_api_key;
+    $user_id = FreshRSS_Context::$user_conf->zotero_user_id;
+    $collection_key = FreshRSS_Context::$user_conf->zotero_collection_key;
+    $translation_server_url = FreshRSS_Context::$user_conf->zotero_translation_server_url;
+    $extra_tags = FreshRSS_Context::$user_conf->zotero_extra_tags;
+    $keyboard_shortcut = FreshRSS_Context::$user_conf->zotero_keyboard_shortcut;
+?>
+
+<form action="<?php echo _url('extension', 'configure', 'e', urlencode($this->getName())); ?>" method="post">
+    <input type="hidden" name="_csrf" value="<?php echo FreshRSS_Auth::csrfToken(); ?>" />
+
+    <div class="form-group">
+        <label class="group-name" for="zotero_api_key"><?php echo _t('ext.starToZotero.configure.api_key'); ?></label>
+        <div class="group-controls">
+            <input type="password" name="zotero_api_key" id="zotero_api_key" value="<?php echo htmlspecialchars($api_key); ?>">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="group-name" for="zotero_user_id"><?php echo _t('ext.starToZotero.configure.user_id'); ?></label>
+        <div class="group-controls">
+            <input type="text" name="zotero_user_id" id="zotero_user_id" value="<?php echo htmlspecialchars($user_id); ?>">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="group-name" for="zotero_collection_key"><?php echo _t('ext.starToZotero.configure.collection_key'); ?></label>
+        <div class="group-controls">
+            <input type="text" name="zotero_collection_key" id="zotero_collection_key" value="<?php echo htmlspecialchars($collection_key); ?>">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="group-name" for="zotero_translation_server_url"><?php echo _t('ext.starToZotero.configure.translation_server_url'); ?></label>
+        <div class="group-controls">
+            <input type="text" name="zotero_translation_server_url" id="zotero_translation_server_url" placeholder="http://127.0.0.1:1969" value="<?php echo htmlspecialchars($translation_server_url); ?>">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="group-name" for="zotero_extra_tags"><?php echo _t('ext.starToZotero.configure.extra_tags'); ?></label>
+        <div class="group-controls">
+            <input type="text" name="zotero_extra_tags" id="zotero_extra_tags" value="<?php echo htmlspecialchars($extra_tags ?: 'source:rss,inbox'); ?>">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="group-name" for="keyboard_shortcut"><?php echo _t('ext.starToZotero.configure.keyboard_shortcut'); ?></label>
+        <div class="group-controls">
+            <input type="text" name="keyboard_shortcut" id="keyboard_shortcut" maxlength="1" value="<?php echo htmlspecialchars($keyboard_shortcut); ?>">
+        </div>
+    </div>
+
+    <div class="alert alert-warn">
+        <?php echo _t('ext.starToZotero.configure.save_hint'); ?>
+    </div>
+
+    <div class="form-group form-actions">
+        <div class="group-controls">
+            <button type="submit" class="btn btn-important"><?php echo _t('gen.action.submit'); ?></button>
+        </div>
+    </div>
+</form>
+
+<?php if ($this->isEnabled() && (!empty($user_id) || !empty($collection_key))): ?>
+    <p class="alert alert-success">
+        <?php echo _t('ext.starToZotero.configure.connected', htmlspecialchars($user_id), htmlspecialchars($collection_key)); ?>
+    </p>
+<?php elseif (!$this->isEnabled()): ?>
+    <p class="alert alert-error">
+        <?php echo _t('ext.starToZotero.configure.extension_disabled'); ?>
+    </p>
+<?php endif ?>
