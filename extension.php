@@ -124,8 +124,9 @@ class StarToZoteroExtension extends Minz_Extension {
             if (!is_array($it)) {
                 $out[] = $it; continue;
             }
+
+            // Top-level bibliographic item
             if (($it['itemType'] ?? '') !== 'attachment' && !isset($it['note'])) {
-                // top-level bibliographic item
                 $existingTags = array_map(fn($t) => $t['tag'] ?? '', $it['tags'] ?? array());
                 foreach ($tagObjs as $to) {
                     if (!in_array($to['tag'], $existingTags, true)) {
@@ -138,7 +139,46 @@ class StarToZoteroExtension extends Minz_Extension {
                 }
                 $it['collections'] = $cols;
             }
+
+            // Handle attachments (PDFs/Snapshots)
+            if (($it['itemType'] ?? '') === 'attachment') {
+                // Setting linkMode to 'imported_url' triggers the Zotero client to 
+                // download the file and move it to WebDAV during sync.
+                $it['linkMode'] = $it['linkMode'] ?? 'imported_url';
+            }
+
             $out[] = $it;
+        }
+
+        // Check if there is already an attachment
+        $hasAttachment = false;
+        foreach ($out as $it) {
+            if (($it['itemType'] ?? '') === 'attachment') {
+                $hasAttachment = true;
+                break;
+            }
+        }
+
+        // Fallback: If no attachment was provided by the translation server, 
+        // add a basic snapshot attachment.
+        if (!$hasAttachment && count($out) > 0) {
+            $mainItemIndex = -1;
+            foreach ($out as $idx => $it) {
+                if (($it['itemType'] ?? '') !== 'attachment') {
+                    $mainItemIndex = $idx;
+                    break;
+                }
+            }
+
+            if ($mainItemIndex !== -1 && !empty($out[$mainItemIndex]['url'])) {
+                $out[] = array(
+                    'itemType'    => 'attachment',
+                    'linkMode'    => 'imported_url',
+                    'title'       => 'Snapshot',
+                    'url'         => $out[$mainItemIndex]['url'],
+                    'contentType' => 'text/html',
+                );
+            }
         }
 
         return $out;
